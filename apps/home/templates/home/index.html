@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h3 class="card-title">Obtener valores de UDIS o DOLAR</h3>
+                        <form action="">
+                            <div class="row">
+                                <div class="form-group col-md-3">
+                                    <label for="">Selecciona tipo</label>
+                                    <select name="type" class="form-control">
+                                        <option value="SP68257">UDIS</option>
+                                        <option value="SF43718">DOLAR</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="">Fecha inicial</label>
+                                    <input type="date" class="form-control" name="initial_date" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="">Fecha final</label>
+                                    <input type="date" class="form-control" name="final_date" required>
+                                </div>
+                                <div class="col-md-3 d-flex align-items-center">
+                                    <input type="submit" value="Buscar" class="btn btn-outline-primary">
+                                </div>
+                            </div>
+                        </form>
+
+                        <p>
+                            <span class="badge badge-primary">Promedio {{ promedio }} </span>
+                            <span class="badge badge-success">Maximo {{ max_value }} </span>
+                            <span class="badge badge-danger">Minimo {{ min_value }} </span>
+
+                        </p>
+                        <table class="table table-bordered" id="table-results">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for d in data %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ d.fecha }}</td>
+                                    {% if request.GET.type == 'SP68257' %}
+                                        <td>UDIS</td>
+                                    {% else %}
+                                        <td>DOLAR</td>
+                                    {% endif %}
+                                    <td>{{ d.dato }}</td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+                        <canvas id="myChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        $("#table-results").dataTable();
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            // The type of chart we want to create
+            type: 'line',
+
+            // The data for our dataset
+            data: {
+                labels: {{ labels_chart|safe }},
+                datasets: [{
+                    label: 'Grafica',
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: {{ data_chart|safe }}
+                }]
+            },
+
+            // Configuration options go here
+            options: {}
+        });
+    </script>
+{% endblock %}
